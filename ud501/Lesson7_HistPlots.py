@@ -7,7 +7,9 @@ import numpy as np
 import time
 
 
-# Define functions
+# Define Functions
+
+
 
 
 def symbol_to_path(symbol, base_dir='Stock_Data'):
@@ -68,43 +70,39 @@ def daily_returns(df):
     """Compute and return daily returns for a dataframe of daily stock data"""
 
     d_returns = (df / df.shift(1)) - 1
-    d_returns.ix[0, :] = 0
+    d_returns.ix[0] = 0
 
     return d_returns
 
 
 def test_run():
-
-    # Set up data
+    symbols = ['SPY', 'GOOG', 'IBM']
+    metric = 'Adj Close'
     start_date = '2017-01-01'
     end_date = '2017-12-31'
-    metric = 'Adj Close'
-    stocks = ['SPY', 'GOOG', 'GLD']
 
-    # Grab stock data
-    df = import_stock_range(start_date, end_date, metric, stocks)
+    df1 = import_stock_range(start_date, end_date, metric, symbols)
+    SPY_daily = daily_returns(df1['SPY'])
 
-    # Plot SPY data
-    ax = df['SPY'].plot(title='SPY Rolling Mean and Bands', label='SPY')
+    # Histogram
+    SPY_daily.hist(bins=20)
+    #mpl.show()
 
-    # Calculate and plot rolling mean
-    rm_SPY = df['SPY'].rolling(window=20, center=False).mean()
-    rm_SPY.plot(label='Rolling Mean', ax=ax)
+    # Mean, stddev, and kurtosis
+    mean = SPY_daily.mean()
+    std = SPY_daily.std()
 
-    # Calculate and plot Bollinger bands
-    bb_SPY = bollinger_bands(df['SPY'], 20)
-    bb_SPY.plot(label='Bollinger Bands', ax=ax)
+    print('Daily Returns for {} between {} and {}:'.format('SPY', start_date, end_date))
+    print('Mean: {}'.format(mean))
+    print('Std Dev: {}'.format(std))
+    print('Kurtosis: {}'.format(SPY_daily.kurtosis()))
 
-    # Format plot and show plot
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Price')
-    ax.legend(loc='upper left')
+    mpl.axvline(mean, color='w', linestyle='dashed', linewidth=2)
+    mpl.axvline(std, color='r', linestyle='dashed', linewidth=1)
+    mpl.axvline(-std, color='r', linestyle='dashed', linewidth=1)
     mpl.show()
-
-    # Daily Returns
 
 
 if __name__ == "__main__":
     test_run()
-
 
