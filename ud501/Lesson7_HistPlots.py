@@ -76,10 +76,10 @@ def daily_returns(df):
 
 
 def test_run():
-    symbols = ['SPY', 'GOOG', 'IBM']
+    symbols = ['SPY', 'GOOG', 'IBM', 'XOM']
     metric = 'Adj Close'
-    start_date = '2017-01-01'
-    end_date = '2017-12-31'
+    start_date = '2009-01-01'
+    end_date = '2012-12-31'
 
     df1 = import_stock_range(start_date, end_date, metric, symbols)
     SPY_daily = daily_returns(df1['SPY'])
@@ -92,7 +92,7 @@ def test_run():
     mean = SPY_daily.mean()
     std = SPY_daily.std()
 
-    print('Daily Returns for {} between {} and {}:'.format('SPY', start_date, end_date))
+    print('Daily % Returns for {} between {} and {}:'.format('SPY', start_date, end_date))
     print('Mean: {}'.format(mean))
     print('Std Dev: {}'.format(std))
     print('Kurtosis: {}'.format(SPY_daily.kurtosis()))
@@ -102,6 +102,21 @@ def test_run():
     mpl.axvline(-std, color='r', linestyle='dashed', linewidth=1)
     mpl.show()
 
+    # Compare two histograms
+    daily_returns_all = daily_returns(df1)
+    daily_returns_all['SPY'].hist(bins=20, label='SPY')
+    daily_returns_all['XOM'].hist(bins=20, label='XOM')
+    mpl.legend(loc='upper right')
+    mpl.show()
+
+    # Scatterplots
+    daily_returns_all.plot(kind='scatter', x='SPY', y='XOM')
+    beta_XOM,alpha_XOM= np.polyfit(daily_returns_all['SPY'], daily_returns_all['XOM'], 1)
+    mpl.plot(daily_returns_all['SPY'], beta_XOM*daily_returns_all['SPY'] + alpha_XOM, '-', color='r')
+    mpl.show()
+
+    # Correlation
+    print(daily_returns_all.corr(method='pearson'))
 
 if __name__ == "__main__":
     test_run()
