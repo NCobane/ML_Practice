@@ -1,5 +1,6 @@
 import pandas as pd
 import os as os
+import math as math
 import matplotlib.pyplot as mpl
 import numpy as np
 import time
@@ -46,6 +47,15 @@ def normalize_data(df):
     return df / df.ix[0, :]
 
 
+def daily_returns(df):
+    """Compute and return daily returns for a dataframe of daily stock data"""
+
+    d_returns = (df / df.shift(1)) - 1
+    d_returns.ix[0] = 0
+
+    return d_returns
+
+
 def portfolio_value(stocks, alloc, base):
     """Calculates portfolio value based on allocation of base dollars to stocks"""
 
@@ -59,8 +69,15 @@ def portfolio_value(stocks, alloc, base):
     return p_value
 
 
-def sharpe_ratio(portfolio_returns, risk_free):
-    pass
+def sharpe_ratio(daily_rets, daily_rf=0):
+
+    # k constant for 252 measurements / yr (daily frequency)
+    k = math.sqrt(252)
+    print(daily_rets.mean())
+    # Annualized Sharpe Ratio
+    sr = k * ((daily_rets.mean() - daily_rf.mean()) / daily_rets.std())
+
+    return sr.ix[0]
 
 
 def test_run():
@@ -70,7 +87,7 @@ def test_run():
     metric = 'Adj Close'
     start_date = '2009-01-01'
     end_date = '2017-12-31'
-    alloc = [0.2, 0.4, 0.05, 0.15, 0.2]
+    alloc = [0, 1, 0, 0, 0]
     base = 1000000
 
     # Import stocks
@@ -82,11 +99,28 @@ def test_run():
 
     # Calculate portfolio value
     tot_value = portfolio_value(stock_norm, alloc, base)
-    print(tot_value.tail(50))
+    #  print(tot_value.head(50))
 
-    # Cumulative Sharpe Ratio
+    # Set risk-free return rate
+    ref_rate = 0.0245
+    daily_rate = ((1 + ref_rate) ** (1.0 / 252)) - 1
+    ret_r = pd.DataFrame(np.repeat(daily_rate, len(daily_returns(tot_value).index)))
+    ret_rf = ret_r + daily_rate
 
 
+
+    # Portfolio Stats
+
+    cm_return = tot_value.ix[tot_value.last_valid_index()] - tot_value.ix[tot_value.first_valid_index()]
+    cm_pct_return = (cm_return / base) * 100
+    avg_daily_ret = daily_returns(tot_value).mean()
+    risk = daily_returns(tot_value).std()
+    sr = sharpe_ratio(daily_returns(tot_value), ret_rf)
+
+    print('Cumulative Return: ${} ({}%)'.format(cm_return, cm_pct_return))
+    print('Avg Daily Return: {}'.format(avg_daily_ret))
+    print('Risk (Std Dev of daily returns): {}'.format(risk))
+    print('Sharpe Ratio: {}'.format(sr))
 
 
 if __name__ == "__main__":
