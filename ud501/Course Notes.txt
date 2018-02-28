@@ -1,0 +1,49 @@
+
+
+///////////////////////////////////////////////////
+**** 02-02 Lesson 12: How stock orders work ****
+
+-- What is an order?:
+- Buy or Sell
+- Symbol
+- # of shares
+- Limit or Market
+	Limit: Set a price that will not be exceeded
+	Market: Whatever price the market offers
+
+-- The Order Book:
+- List of bids/asks, with symbol, price, size. Exchange fulfills at best (lowest/highest for bid/ask, respectively)
+- If there are more ASK orders outstanding, price will likely decrease. Bid is opposite
+
+-- How orders get to the exchange:
+ Order (you) --> Broker --> Exchange with best price
+ Alternatively: Order (you) --> Broker --> Other user (prices must be at least as good as exchange)
+ Dark Pool: Pays brokers to look at orders between brokers before they are executed, leaving the exchanges out
+
+ -- How hedge funds exploit market mechanics:
+ - 100m = 0.3us in info travel time
+ - 1) Hedge fund continually observes order book, make prediction on movement. Stock is going to go up, HF buys stock. Other brokers located further away also execute orders to bu, but those orders come in late and the HF exploits the price difference due to the ms in timing
+ - 2) Monitor differences between prices in different markets (NYSE vs London, for example) and quickly executes buy/sell arbitrage between locations
+
+-- Additional order types:
+- Exchanges: Buy/Sell, Market/Limit
+- Broker: 
+	Stop loss: When the stock drops to a certain price, sell
+	Stop gain: When stock increases to a certain price, sell
+	Trailing stop: eg 10c behind the stock, continually updated stop loss
+	Short sell: Bet against a stock
+	-- Mechanics of shortselling:
+	Borrow shares (via broker), then sell those shares to a buyer. You then have the cash, but owe the stock. You then later buy the same volume of shares (ideally at a cheaper price) and give back the borrowed shares, exiting your position.
+	What can go wrong?: If the stock goes up, you can lose money. There is no limit to the amount a stock can increase, so potential losses are unlimited.
+
+
+///////////////////////////////////////////////////
+**** 02-03 Lesson 13: What is a company worth? ****
+
+-- Why company value matters:
+Buy when "true" value is higher than stock price, sell when "true" value is lower than price
+
+ -- Discount Rate (IR):
+ - Present Value = Future Value / (1 + IR)^i
+ - Sum this to inifinity years  = FV / (n-1) = FV / Discount Rate
+ 
